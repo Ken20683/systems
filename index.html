@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Tooth Dental – Clinic Management</title>
+    <!-- Bootstrap & icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <!-- Chart.js for dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ---------- GLOBAL & THEME ---------- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+        }
+        body.login-screen .navbar-custom,
+        body.login-screen .footer { display: none; }
+        body.login-screen #appContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .main-card.login-card {
+            width: 100%; max-width: 300px; padding: 0.75rem;
+            margin: 0.75rem auto;
+        }
+        .login-card .text-center { margin-bottom: 0.45rem !important; }
+        .login-card .mb-3 { margin-bottom: 0.5rem !important; }
+        .login-card .form-control { padding: 0.4rem 0.7rem; }
+        .login-card .btn-action { min-height: 44px; padding: 0.5rem 0.8rem; }
+        .login-logo {
+            display: block; width: 48px; height: 48px;
+            object-fit: contain; margin: 0 auto 0.35rem;
+            border-radius: 14px;
+        }
+        .navbar-custom {
+            background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            padding: 0.75rem 0;
+        }
+        .navbar-brand {
+            color: #ffffff !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+        .navbar-custom .btn-action {
+            padding: 0.24rem 0.35rem;
+            border-radius: 7px;
+            font-size: 0.72rem;
+        }
+        .navbar-custom .dashboard-nav-button {
+            display: none;
+            background: #f1c40f;
+            border-color: #f1c40f;
+            color: #1a2332;
+            font-weight: 700;
+        }
+        @media (max-width: 991.98px) {
+            .navbar-custom .dashboard-nav-button { display: block; }
+            .navbar-custom .navbar-toggler {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                color: #fff;
+                border-color: rgba(255,255,255,0.65);
+            }
+            .navbar-custom .navbar-toggler-label {
+                font-size: 0.8rem;
+                line-height: 1;
+            }
+            #navbarNav .navbar-nav {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.35rem;
+                margin-top: 0.75rem;
+            }
+            #navbarNav .nav-item { min-width: 0; }
+            .navbar-custom .btn-action {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                justify-self: stretch;
+                margin: 0 !important;
+                padding: 0.28rem 0.36rem;
+                border-radius: 7px;
+                font-size: 0.72rem;
+                line-height: 1.2;
+                white-space: normal;
+                text-align: center;
+            }
+            .navbar-custom .btn-action i {
+                font-size: 0.8rem;
+                margin-right: 0.2rem;
+            }
+            #darkModeToggle { padding: 0.38rem 0.6rem; }
+        }
+        @media (max-width: 575.98px) {
+            .navbar-custom { padding: 0.45rem 0; }
+            .navbar-brand {
+                font-size: 0.95rem;
+            }
+            .brand-logo {
+                width: 32px;
+                height: 32px;
+            }
+            .navbar-custom .navbar-toggler { padding: 0.28rem 0.4rem; }
+            .navbar-custom .btn-action {
+                min-height: 34px;
+                padding: 0.22rem 0.28rem;
+                font-size: 0.68rem;
+                border-radius: 6px;
+            }
+        }
+        .navbar-brand i { margin-right: 8px; color: #f1c40f; }
+        .brand-logo {
+            width: 42px; height: 42px; object-fit: cover;
+            border-radius: 50%; background: rgba(255,255,255,0.9);
+            padding: 2px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-right: 10px; vertical-align: middle;
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+        .dashboard-logo {
+            max-height: 120px; max-width: 100%;
+            width: auto; object-fit: contain;
+            border-radius: 18px; background: rgba(255,255,255,0.12);
+            padding: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .btn-action {
+            border-radius: 25px; padding: 10px 25px;
+            font-weight: 500; transition: all 0.3s;
+        }
+        .main-card form .btn-action {
+            display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+            min-height: 48px; padding: 0.7rem 1rem;
+            font-size: 0.95rem; font-weight: 600;
+            box-shadow: 0 3px 8px rgba(26,35,50,0.15);
+        }
+        .compact-form-actions { display: grid; gap: 0.5rem; }
+        .dashboard-return { margin: 0.75rem auto 1rem; }
+        .treatment-form-card {
+            max-width: 400px !important;
+            padding: .1rem;
+        }
+        .treatment-form-card h3 { margin-bottom: 1rem !important; }
+        .treatment-value-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+        @media (max-width: 575.98px) {
+            .compact-form-card {
+                padding: 0.8rem;
+                margin: 0.5rem auto;
+                border-radius: 14px;
+            }
+            .compact-form-card h3 {
+                margin-bottom: 0.65rem !important;
+                font-size: 1.05rem;
+            }
+            .compact-form-card .mb-3 { margin-bottom: 0.45rem !important; }
+            .compact-form-card .form-control,
+            .compact-form-card .form-select {
+                padding: 0.35rem 0.65rem;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                line-height: 1.25;
+            }
+            .compact-form-card .patient-contact-row { margin-bottom: 0.45rem; }
+            .compact-form-card .compact-form-actions {
+                grid-template-columns: minmax(0, 1fr) minmax(5.5rem, 0.7fr);
+            }
+            .compact-form-card .btn-action {
+                min-height: 44px;
+                padding: 0.55rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            .treatment-form-card { padding: 0.8rem; }
+            .treatment-form-card .mb-3 { margin-bottom: 0.35rem !important; }
+            .treatment-form-card h3 { margin-bottom: 0.5rem !important; }
+        }
+        .dashboard-action-button {
+            padding: 0.2rem 0.75rem; font-size: 0.85rem;
+        }
+        .dashboard-materials-button {
+            min-height: 34px;
+            padding: 0.24rem 0.5rem;
+            font-size: 0.74rem;
+            line-height: 1.2;
+        }
+        @media (max-width: 575.98px) {
+            .dashboard-action-button {
+                padding: 0.3rem 0.45rem;
+                font-size: 0.7rem;
+                line-height: 1.2;
+            }
+            .dashboard-materials-button {
+                min-height: 38px;
+                padding: 0.25rem 0.55rem;
+                font-size: 0.74rem;
+            }
+        }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .footer {
+            background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
+            color: white; padding: 1rem 0 1rem; margin-top: auto;
+        }
+        .footer a { color: #eeeaed; text-decoration: none; }
+        .footer a:hover { color: #fff; text-decoration: underline; }
+        .footer .social-icons i { font-size: 1.5rem; margin: 0 10px; transition: all 0.3s; }
+        .footer .social-icons i:hover { transform: translateY(-3px); color: #f1c40f; }
+        .main-card {
+            background: white; border-radius: 20px; padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin: 2rem auto; max-width: 1200px; width: 100%;
+        }
+        body.dark-mode .main-card { background: #2c3e50; color: #e0e0e0; }
+        .form-control, .form-select {
+            border-radius: 10px; padding: 12px 15px;
+            border: 2px solid #c9e3dd; background-color: #f0f8f5;
+            transition: all 0.3s;
+        }
+        body.dark-mode .form-control, body.dark-mode .form-select {
+            background: #3a3a4e; border-color: #4a4a5e; color: #e0e0e0;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #5e0e46; background-color: #e6f4ef;
+            box-shadow: 0 0 0 0.2rem rgba(36,143,120,0.16);
+        }
+        .stat-card {
+            background: hwb(0 94% 4%); border-radius: 20px; padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s; margin-bottom: 1rem;
+            border-left: 5px solid #2d8cf0;
+        }
+        body.dark-mode .stat-card { background: #2c3e50; color: #e0e0e0; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .stat-card .number { font-size: 2.2rem; font-weight: bold; color: #1a2332; }
+        body.dark-mode .stat-card .number { color: #4bc0c0; }
+        .stat-card .label { color: #7f8c8d; font-size: 0.85rem; text-transform: uppercase; }
+        .dashboard-page { padding: 1.5rem; }
+        .dashboard-page .dashboard-hero {
+            padding: 1rem; border-radius: 14px;
+            background: linear-gradient(120deg, #19734f 0%, #246779 100%);
+            color: white;
+        }
+        .dashboard-page .dashboard-hero h1 { font-size: 1.4rem; line-height: 1.2; }
+        .dashboard-page .dashboard-hero p { font-size: 0.84rem; opacity: 0.92; }
+        .dashboard-page .dashboard-logo {
+            max-height: 64px; max-width: 96px; padding: 3px;
+            border-radius: 12px;
+        }
+        .dashboard-page .dashboard-date {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            margin: 0.15rem 0 0.15rem 0.3rem; padding: 0.35rem 0.5rem;
+            border-radius: 8px; background: rgba(255,255,255,0.16);
+            font-size: 0.72rem;
+        }
+        .dashboard-page .dashboard-kpis .stat-card {
+            height: 100%; min-height: 126px; margin: 0; padding: 1rem;
+            border-left-width: 4px; border-radius: 12px;
+        }
+        .dashboard-page .dashboard-kpis .icon {
+            display: grid; place-items: center; width: 34px; height: 34px;
+            margin-bottom: 0.65rem; border-radius: 9px; background: #eef7f3;
+            font-size: 1rem;
+        }
+        body.dark-mode .dashboard-page .dashboard-kpis .icon { background: #354d50; }
+        .dashboard-page .dashboard-kpis .number { font-size: 1.55rem; line-height: 1.15; overflow-wrap: anywhere; }
+        .dashboard-page .dashboard-kpis .label { margin-top: 0.3rem; font-size: 0.7rem; letter-spacing: 0.04em; }
+        .dashboard-page .dashboard-chart {
+            height: 100%; padding: 1rem; border: 1px solid #e3ece8;
+            border-radius: 12px; background: #fff;
+        }
+        body.dark-mode .dashboard-page .dashboard-chart {
+            border-color: #465b61; background: #263a43; color: #e0e0e0;
+        }
+        .dashboard-page .dashboard-chart h5 { margin-bottom: 0.8rem; font-size: 1rem; }
+        .dashboard-page .dashboard-expenses { padding: 1rem; border-radius: 12px; background: #f3f8f6; }
+        body.dark-mode .dashboard-page .dashboard-expenses { background: #263a43; }
+        .dashboard-page .dashboard-stock-summary {
+            padding: 0.65rem; border-radius: 10px; background: #f3f8f6;
+        }
+        body.dark-mode .dashboard-page .dashboard-stock-summary { background: #263a43; }
+        .dashboard-page .dashboard-expenses h5 { margin: 0; font-size: 1rem; }
+        .dashboard-page .dashboard-expenses .stat-card { min-height: 96px; padding: 0.9rem; border-radius: 10px; }
+        .dashboard-page .dashboard-expenses .number { font-size: 1.25rem; }
+        @media (max-width: 575.98px) {
+            .dashboard-page { padding: 0.75rem; margin: 0.5rem auto; border-radius: 14px; }
+            .dashboard-page .dashboard-hero { padding: 0.65rem; }
+            .dashboard-page .dashboard-hero h1 { margin-bottom: 0.35rem !important; font-size: 1rem; }
+            .dashboard-page .dashboard-hero p { font-size: 0.72rem; }
+            .dashboard-page .dashboard-logo { max-height: 42px; max-width: 64px; padding: 2px; }
+            .dashboard-page .dashboard-hero .col-md-4 { margin-top: 0.35rem; text-align: left; }
+            .dashboard-page .dashboard-date { margin: 0.1rem 0.25rem 0.1rem 0; padding: 0.25rem 0.4rem; font-size: 0.64rem; }
+            .dashboard-page .dashboard-materials-button { min-height: 36px; margin-top: 0.35rem !important; }
+            .dashboard-page .dashboard-kpis .stat-card { min-height: 106px; padding: 0.75rem; }
+            .dashboard-page .dashboard-kpis .number { font-size: 1.25rem; }
+            .dashboard-page .dashboard-kpis .label { font-size: 0.64rem; }
+            .dashboard-page .dashboard-chart { padding: 0.8rem; }
+            .dashboard-page .dashboard-expenses { padding: 0.8rem; }
+            .dashboard-page .dashboard-expenses .stat-card { padding: 0.7rem; }
+            .dashboard-page .dashboard-expenses .number { font-size: 1.05rem; }
+        }
+        .receipt-card {
+            background: white; border-radius: 15px; padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px; margin: 2rem auto;
+        }
+        .receipt-logo {
+            display: block; width: 100px; height: 100px; object-fit: contain;
+            margin: 0 auto 0.100rem; border-radius: 12px;
+        }
+        body.dark-mode .receipt-card { background: #2c3e50; color: #e0e0e0; }
+        .table-hover tbody tr:hover { background-color: #f1f1f1; }
+        body.dark-mode .table-hover tbody tr:hover { background-color: #3a3a4e; }
+        .dark-mode-toggle {
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer;
+            font-size: 1rem; transition: all 0.3s;
+        }
+        .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); }
+        .text-muted { color: #6c757d !important; }
+        body.dark-mode .text-muted { color: #b0b0b0 !important; }
+        /* Print */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .main-card, .receipt-card { box-shadow: none; border: 1px solid #ddd; }
+        }
+    </style>
+</head>
+<body class="login-screen">
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-expand-lg navbar-custom no-print">
+    <div class="container">
+        <a href="#" class="navbar-brand" onclick="showPage('dashboard');return false;">
+            <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="brand-logo">
+            HAPPY TOOTH DENTAL
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation menu">
+            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-label">Menu</span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a href="#" class="btn btn-action dashboard-nav-button me-2" onclick="showPage('dashboard');return false;"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-success btn-action me-2" onclick="showPage('materials');return false;"><i class="bi bi-box-seam"></i> Materials Tracker</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-success btn-action me-2" onclick="showPage('addPatient');return false;"><i class="bi bi-person-plus"></i> New Patient</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-outline-light btn-action me-2" onclick="showPage('security');return false;"><i class="bi bi-shield-lock"></i> Security</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-info btn-action me-2 text-white" onclick="showPage('addVisit');return false;"><i class="bi bi-plus-circle"></i> New Visit</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-danger btn-action me-2 text-white" onclick="showPage('addExpense');return false;"><i class="bi bi-wallet2"></i> New Expense</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-primary btn-action me-2" onclick="showPage('patients');return false;"><i class="bi bi-people"></i> All Patients</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-warning btn-action me-2 text-dark" onclick="showPage('visits');return false;"><i class="bi bi-list-ul"></i> View All Visits</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-secondary btn-action me-2 text-white" onclick="showPage('expenses');return false;"><i class="bi bi-receipt"></i> Expenses</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-outline-light btn-action me-2" onclick="showPage('manageMonths');return false;"><i class="bi bi-calendar2-month"></i> Monthly</a></li>
+                <li class="nav-item"><button class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode"><i class="bi bi-moon-fill"></i></button></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ========== MAIN CONTAINER ========== -->
+<div class="container flex-grow-1" id="appContainer">
+    <!-- Pages will be injected here by JavaScript -->
+    <div class="text-center py-5">
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading…</span>
+        </div>
+        <p class="mt-2">Initialising Happy Tooth Dental…</p>
+    </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer no-print">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <h5><i class="bi bi-tooth"></i> HAPPY TOOTH DENTAL</h5>
+                <p class="text-muted">Your trusted dental care provider in Lilongwe.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="bi bi-facebook"></i></a>
+                    <a href="#"><i class="bi bi-instagram"></i></a>
+                    <a href="#"><i class="bi bi-whatsapp"></i></a>
+                    <a href="#"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" onclick="showPage('dashboard');return false;"><i class="bi bi-chevron-right"></i> Dashboard</a></li>
+                    <li><a href="#" onclick="showPage('addPatient');return false;"><i class="bi bi-chevron-right"></i> New Patient</a></li>
+                    <li><a href="#" onclick="showPage('patients');return false;"><i class="bi bi-chevron-right"></i> All Patients</a></li>
+                    <li><a href="#" onclick="showPage('addVisit');return false;"><i class="bi bi-chevron-right"></i> New Visit</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h5 style="color: #10d420;">Contact Info</h5>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-geo-alt"></i> Lilongwe Area 25C near Nazareen Church, EML Complex</li>
+                    <li><i class="bi bi-telephone"></i> 0992239889</li>
+                    <li><i class="bi bi-envelope"></i> happytoothdental25c@gmail.com</li>
+                    <li><i class="bi bi-whatsapp"></i> 0882407607</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="bg-secondary">
+        <div class="text-center text-muted">
+            <p>&copy; 2026 HAPPY TOOTH DENTAL. All rights reserved. | Developed by Kenneth Chirambo</p>
+        </div>
+    </div>
+</footer>
+
+<!-- ========== JAVASCRIPT ========== -->
+<script>
+// ================================================================
+// 1. DATA STORE (localStorage + in-memory fallback)
+// ================================================================
+const DB = {
+    patients: [],
+    visits: [],
+    expenses: [],
+    materials: [],
+    stockIns: [],
+    materialStock: { gloves:0, needles:0, lidocaine:0 },
+    archives: [],
+    procedures: [
+        { id:1, name:'Extraction', price:15000 },
+        { id:2, name:'Disimpaction/Surgical Extraction', price:50000 },
+        { id:3, name:'Infected/Dry Socket', price:8000 },
+        { id:4, name:'Scaling and Polishing', price:20000 },
+        { id:5, name:'Composite Filling', price:20000 },
+        { id:6, name:'Amalgam Filling', price:20000 },
+        { id:7, name:'Temporary Filling', price:15000 },
+        { id:8, name:'Root Canal Therapy - Single Canal', price:45000 },
+        { id:9, name:'Root Canal Therapy - Two Canal', price:50000 },
+        { id:10, name:'Root Canal Therapy - Multiple Canals', price:70000 },
+        { id:11, name:'Dentures up to Tooth', price:80000 },
+        { id:12, name:'Acrylic Crown', price:250000 },
+        { id:13, name:'Acrylic Bridge', price:750000 },
+        { id:14, name:'Porcelain Crown', price:300000 },
+        { id:15, name:'Zirconium Crown', price:900000 },
+        { id:16, name:'Zirconium Bridge', price:400000 },
+        { id:17, name:'Gold/Silver Inlays and Crowns', price:1200000 },
+        { id:18, name:'Gold/Silver Bridge', price:500000 },
+        { id:19, name:'Star and Other Tooth Jewellery Installation', price:1500000 },
+        { id:20, name:'Orthodontic Treatment (Braces)', price:100000 },
+        { id:21, name:'Suturing', price:150000 },
+        { id:22, name:'Teeth Splinting', price:20000 },
+        { id:23, name:'Consultation', price:8000 },
+        { id:24, name:'Dentures - Any Addition Tooth', price:8000 }
+    ],
+    nextPatientId: 1,
+    nextVisitId: 1,
+    nextExpenseId: 1,
+    nextMaterialId: 1,
+    nextStockInId: 1,
+    nextArchiveNumber: 1
+};
+const LOGIN_CONFIG_KEY = 'happyToothLogin';
+const LOGIN_HASH_ITERATIONS = 150000;
+const INITIAL_LOGIN_PASSWORD = '2000';
+const LOGIN_SESSION_KEY = 'happyToothAuthenticated';
+let isAuthenticated = localStorage.getItem(LOGIN_SESSION_KEY) === 'true';
+
+// Load from localStorage
+function loadDB() {
+    try {
+        const stored = localStorage.getItem('happyToothDB');
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            DB.patients = parsed.patients || [];
+            DB.visits = parsed.visits || [];
+            DB.expenses = parsed.expenses || [];
+            DB.materials = parsed.materials || [];
+            DB.stockIns = parsed.stockIns || [];
+            const savedStock = parsed.materialStock || {};
+            DB.materialStock = {
+                gloves: Math.max(0, Number(savedStock.gloves) || 0),
+                needles: Math.max(0, Number(savedStock.needles) || 0),
+                lidocaine: Math.max(0, Number(savedStock.lidocaine) || 0)
+            };
+            DB.archives = parsed.archives || [];
+            DB.nextPatientId = parsed.nextPatientId || 1;
+            DB.nextVisitId = parsed.nextVisitId || 1;
+            DB.nextExpenseId = parsed.nextExpenseId || 1;
+            DB.nextMaterialId = parsed.nextMaterialId || (DB.materials.reduce((highest, item) => Math.max(highest, item.id || 0), 0) + 1);
+            DB.nextStockInId = parsed.nextStockInId || (DB.stockIns.reduce((highest, item) => Math.max(highest, item.id || 0), 0) + 1);
+            const highestArchiveNumber = DB.archives.reduce((highest, archive, index) => {
+                if (!Number.isInteger(archive.archiveNumber)) archive.archiveNumber = index + 1;
+                return Math.max(highest, archive.archiveNumber);
+            }, 0);
+            DB.nextArchiveNumber = Math.max(parsed.nextArchiveNumber || 1, highestArchiveNumber + 1);
+        } else {
+            seedDemoData();
+        }
+    } catch (e) {
+        console.warn('Could not load DB', e);
+        seedDemoData();
+    }
+}
+function saveDB() {
+    try {
+        localStorage.setItem('happyToothDB', JSON.stringify({
+            patients: DB.patients,
+            visits: DB.visits,
+            expenses: DB.expenses,
+            materials: DB.materials,
+            stockIns: DB.stockIns,
+            materialStock: DB.materialStock,
+            archives: DB.archives,
+            nextPatientId: DB.nextPatientId,
+            nextVisitId: DB.nextVisitId,
+            nextExpenseId: DB.nextExpenseId,
+            nextMaterialId: DB.nextMaterialId,
+            nextStockInId: DB.nextStockInId,
+            nextArchiveNumber: DB.nextArchiveNumber
+        }));
+    } catch (e) { /* ignore */ }
+}
+function seedDemoData() {
+    // Demo patients
+    DB.patients = [
+        { id:1, name:'John Doe', phone:'0999123456', address:'Area 25', created:'2026-01-01' },
+        { id:2, name:'Jane Smith', phone:'0999234567', address:'Area 18', created:'2026-01-02' },
+        { id:3, name:'Robert Mwale', phone:'0999345678', address:'Area 47', created:'2026-01-03' }
+    ];
+    DB.visits = [
+        { id:1, patient_id:1, procedure_id:4, visit_date:'2026-01-15', amount:18000, notes:'Cleaning' },
+        { id:2, patient_id:1, procedure_id:5, visit_date:'2026-01-15', amount:8000, notes:'Filling' },
+        { id:3, patient_id:2, procedure_id:23, visit_date:'2026-01-16', amount:40000, notes:'Consult' },
+        { id:4, patient_id:3, procedure_id:1, visit_date:'2026-01-18', amount:15000, notes:'Extraction' }
+    ];
+    DB.expenses = [
+        { id:1, title:'Dental Supplies', category:'Supplies', amount:45000, expense_date:'2026-01-10', payment_method:'Cash', notes:'Gloves, masks' },
+        { id:2, title:'Electricity', category:'Utilities', amount:32000, expense_date:'2026-01-12', payment_method:'Mobile Money', notes:'January bill' }
+    ];
+    DB.archives = [];
+    DB.nextPatientId = 4;
+    DB.nextVisitId = 5;
+    DB.nextExpenseId = 3;
+    DB.nextArchiveNumber = 1;
+    saveDB();
+}
+loadDB();
+
+// ================================================================
+// 2. HELPERS
+// ================================================================
+function formatMK(amount) {
+    return 'MK ' + Number(amount).toLocaleString('en-US', { minimumFractionDigits:0, maximumFractionDigits:0 });
+}
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[character]));
+}
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+function getProcedureName(id) {
+    const p = DB.procedures.find(p => p.id === id);
+    return p ? p.name : 'Unknown';
+}
+function getProcedurePrice(id) {
+    const p = DB.procedures.find(p => p.id === id);
+    return p ? p.price : 0;
+}
+function getPatientName(id) {
+    const p = DB.patients.find(p => p.id === id);
+    return p ? p.name : 'Unknown';
+}
+function getPatientPhone(id) {
+    const p = DB.patients.find(p => p.id === id);
+    return p ? p.phone : '';
+}
+
+function bytesToHex(bytes) {
+    return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+function hexToBytes(hex) {
+    if (!/^(?:[0-9a-f]{2})+$/i.test(hex)) throw new Error('The saved login configuration is invalid.');
+    return Uint8Array.from(hex.match(/.{2}/g), byte => parseInt(byte, 16));
+}
+async function hashLoginPassword(password, salt) {
+    const key = await window.crypto.subtle.importKey(
+        'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']
+    );
+    const result = await window.crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt, iterations: LOGIN_HASH_ITERATIONS, hash: 'SHA-256' },
+        key,
+        256
+    );
+    return bytesToHex(new Uint8Array(result));
+}
+function readLoginConfig() {
+    const saved = localStorage.getItem(LOGIN_CONFIG_KEY);
+    if (!saved) return null;
+    const config = JSON.parse(saved);
+    if (!config || typeof config.salt !== 'string' || typeof config.hash !== 'string' ||
+        config.iterations !== LOGIN_HASH_ITERATIONS) {
+        throw new Error('The saved login configuration is invalid.');
+    }
+    return config;
+}
+async function initializeLoginConfig() {
+    if (readLoginConfig()) return;
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    localStorage.setItem(LOGIN_CONFIG_KEY, JSON.stringify({
+        salt: bytesToHex(salt),
+        hash: await hashLoginPassword(INITIAL_LOGIN_PASSWORD, salt),
+        iterations: LOGIN_HASH_ITERATIONS,
+        isInitial: true
+    }));
+}
+function renderLogin(container) {
+    container.innerHTML = `
+    <div class="main-card login-card">
+        <div class="text-center mb-4">
+            <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="login-logo">
+            <h2 class="h4">Sign In</h2>
+        </div>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="loginPassword" class="form-label">Password</label>
+                <input id="loginPassword" type="password" class="form-control" autocomplete="current-password" required autofocus>
+            </div>
+            <p id="loginError" class="text-danger small" role="alert"></p>
+            <button type="submit" class="btn btn-primary w-100 btn-action"><i class="bi bi-box-arrow-in-right"></i> Log In</button>
+        </form>
+    </div>`;
+
+    const form = document.getElementById('loginForm');
+    const passwordInput = document.getElementById('loginPassword');
+    const errorBox = document.getElementById('loginError');
+    passwordInput.focus();
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        errorBox.textContent = '';
+        try {
+            const config = readLoginConfig();
+            const candidateHash = await hashLoginPassword(passwordInput.value, hexToBytes(config.salt));
+            if (candidateHash !== config.hash) throw new Error('Incorrect password. Please try again.');
+            isAuthenticated = true;
+            localStorage.setItem(LOGIN_SESSION_KEY, 'true');
+            showPage('dashboard');
+        } catch (error) {
+            errorBox.textContent = error instanceof Error ? error.message : 'Unable to verify the password.';
+        }
+    });
+}
+function renderSecuritySettings(container) {
+    container.innerHTML = `
+    <div class="main-card" style="max-width:500px;">
+        <h3 class="mb-4"><i class="bi bi-shield-lock"></i> Security</h3>
+        <form id="changePasswordForm">
+            <div class="mb-3">
+                <label for="currentLoginPassword" class="form-label">Current password</label>
+                <input id="currentLoginPassword" type="password" class="form-control" autocomplete="current-password" required>
+            </div>
+            <div class="mb-3">
+                <label for="newLoginPassword" class="form-label">New password (at least 8 characters)</label>
+                <input id="newLoginPassword" type="password" class="form-control" autocomplete="new-password" minlength="8" required>
+            </div>
+            <div class="mb-3">
+                <label for="confirmLoginPassword" class="form-label">Confirm new password</label>
+                <input id="confirmLoginPassword" type="password" class="form-control" autocomplete="new-password" minlength="8" required>
+            </div>
+            <p id="passwordChangeError" class="text-danger small" role="alert"></p>
+            <div class="compact-form-actions">
+                <button type="submit" class="btn btn-success w-100 btn-action"><i class="bi bi-key"></i> Change Password</button>
+                <button type="button" class="btn btn-secondary w-100 btn-action" id="logoutButton"><i class="bi bi-box-arrow-right"></i> Log Out</button>
+            </div>
+        </form>
+    </div>`;
+
+    document.getElementById('changePasswordForm').addEventListener('submit', async event => {
+        event.preventDefault();
+        const errorBox = document.getElementById('passwordChangeError');
+        errorBox.textContent = '';
+        try {
+            const config = readLoginConfig();
+            const currentPassword = document.getElementById('currentLoginPassword').value;
+            const currentHash = await hashLoginPassword(currentPassword, hexToBytes(config.salt));
+            if (currentHash !== config.hash) throw new Error('Current password is incorrect.');
+
+            const newPassword = document.getElementById('newLoginPassword').value;
+            const confirmPassword = document.getElementById('confirmLoginPassword').value;
+            if (newPassword.length < 8) throw new Error('Use a password with at least 8 characters.');
+            if (newPassword !== confirmPassword) throw new Error('The new passwords do not match.');
+
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            localStorage.setItem(LOGIN_CONFIG_KEY, JSON.stringify({
+                salt: bytesToHex(salt),
+                hash: await hashLoginPassword(newPassword, salt),
+                iterations: LOGIN_HASH_ITERATIONS,
+                isInitial: false
+            }));
+            showPage('dashboard');
+        } catch (error) {
+            errorBox.textContent = error instanceof Error ? error.message : 'Unable to change the password.';
+        }
+    });
+
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        isAuthenticated = false;
+        localStorage.removeItem(LOGIN_SESSION_KEY);
+        showPage('login');
+    });
+}
+
+// ================================================================
+// 3. PAGE ROUTER
+// ================================================================
+function showPage(page, param) {
+    if (page !== 'login' && !isAuthenticated) page = 'login';
+    document.body.classList.toggle('login-screen', page === 'login');
+    const container = document.getElementById('appContainer');
+    // Scroll to top
+    window.scrollTo(0,0);
+    // Highlight active nav (optional)
+    switch(page) {
+        case 'login': renderLogin(container); break;
+        case 'security': renderSecuritySettings(container); break;
+        case 'dashboard': renderDashboard(container); break;
+        case 'addPatient': renderAddPatient(container); break;
+        case 'addVisit': renderAddVisit(container, param); break;
+        case 'addExpense': renderAddExpense(container); break;
+        case 'materials': renderMaterialsTracker(container); break;
+        case 'materialReceipt': renderMaterialReceipt(container, param, false); break;
+        case 'materialStockReceipt': renderMaterialReceipt(container, param, true); break;
+        case 'materialCurrentStockReceipt': renderMaterialReceipt(container, null, false, true); break;
+        case 'patients': renderPatients(container); break;
+        case 'patientHistory': renderPatientHistory(container, param); break;
+        case 'visits': renderVisits(container); break;
+        case 'expenses': renderExpenses(container); break;
+        case 'expenseReceipt': renderExpenseReceipt(container, param); break;
+        case 'receipt': renderReceipt(container, param); break;
+        case 'manageMonths': renderManageMonths(container); break;
+        case 'archiveReport': renderArchiveReport(container, param); break;
+        case 'monthlyReport': renderMonthlyReport(container, param); break;
+        case 'monthlyExpenses': renderMonthlyExpenses(container, param); break;
+        default: renderDashboard(container);
+    }
+
+    if (page !== 'dashboard' && page !== 'login') {
+        const dashboardAction = Array.from(container.querySelectorAll('a, button')).find(control =>
+            (control.getAttribute('onclick') || '').includes("showPage('dashboard')")
+        );
+        if (dashboardAction) {
+            dashboardAction.classList.add('dashboard-return');
+            dashboardAction.innerHTML = '<i class="bi bi-house"></i> Back to Dashboard';
+        } else {
+            const actionRow = document.createElement('div');
+            actionRow.className = 'dashboard-return no-print text-center';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-outline-secondary btn-action';
+            button.innerHTML = '<i class="bi bi-house"></i> Back to Dashboard';
+            button.addEventListener('click', () => showPage('dashboard'));
+            actionRow.appendChild(button);
+            container.appendChild(actionRow);
+        }
+    }
+}
+
+function archiveCurrentMonth() {
+    const now = new Date();
+    const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+    const visits = DB.visits.filter(visit => visit.visit_date.startsWith(currentMonth));
+    const expenses = DB.expenses.filter(expense => expense.expense_date.startsWith(currentMonth));
+    DB.archives.push({
+        archiveNumber: DB.nextArchiveNumber++,
+        month: currentMonth,
+        archivedAt: new Date().toISOString(),
+        patientCount: new Set(visits.map(visit => visit.patient_id)).size,
+        visitCount: visits.length,
+        expenseCount: expenses.length,
+        revenue: visits.reduce((sum, visit) => sum + Number(visit.amount), 0),
+        expenses: expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+    });
+    saveDB();
+    showPage('manageMonths');
+}
+
+function deleteArchivedMonth(archiveNumber) {
+    const archive = DB.archives.find(item => item.archiveNumber === Number(archiveNumber));
+    if (!archive || !confirm(`Delete archive #${archive.archiveNumber} for ${archive.month}? This will not delete patient, visit, or expense records.`)) return;
+    DB.archives = DB.archives.filter(item => item.archiveNumber !== archive.archiveNumber);
+    saveDB();
+    showPage('manageMonths');
+}
+
+// ================================================================
+// 4. PAGE RENDERERS
+// ================================================================
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(container) {
+    const totalPatients = DB.patients.length;
+    const totalVisits = DB.visits.length;
+    const totalRevenue = DB.visits.reduce((s,v) => s + v.amount, 0);
+    const totalExpenses = DB.expenses.reduce((s,e) => s + e.amount, 0);
+    const today = new Date().toISOString().slice(0,10);
+    const todayVisits = DB.visits.filter(v => v.visit_date === today).length;
+    const todayRevenue = DB.visits.filter(v => v.visit_date === today).reduce((s,v) => s + v.amount, 0);
+    const todayExpenses = DB.expenses.filter(e => e.expense_date === today).reduce((s,e) => s + e.amount, 0);
+    const monthExpenses = DB.expenses
+        .filter(e => e.expense_date.startsWith(today.slice(0,7)))
+        .reduce((sum, expense) => sum + expense.amount, 0);
+
+    // Monthly chart data (last 6 months)
+    const months = [];
+    for (let i=5; i>=0; i--) {
+        const d = new Date(); d.setMonth(d.getMonth() - i);
+        const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+        const label = d.toLocaleString('default', { month:'short' });
+        const visits = DB.visits.filter(v => v.visit_date.startsWith(key));
+        const revenue = visits.reduce((s,v) => s + v.amount, 0);
+        months.push({ label, visits: visits.length, revenue });
+    }
+
+    // Procedure distribution
+    const procCounts = {};
+    DB.visits.forEach(v => {
+        const name = getProcedureName(v.procedure_id);
+        procCounts[name] = (procCounts[name] || 0) + 1;
+    });
+    const procLabels = Object.keys(procCounts);
+    const procData = Object.values(procCounts);
+
+    const html = `
+    <div class="main-card dashboard-page">
+        <div class="dashboard-hero mb-3">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="fw-bold mb-2"><i class="bi bi-tooth"></i> HAPPY TOOTH DENTAL</h1>
+                    <p class="mb-0"><i class="bi bi-geo-alt"></i> Lilongwe Area 25C near Nazareen Church, EML Complex</p>
+                    <p class="mb-0"><i class="bi bi-telephone"></i> 0992239889</p>
+                    <button class="btn btn-light text-success fw-bold mt-2 dashboard-materials-button" onclick="showPage('materials')"><i class="bi bi-box-seam"></i> Materials Tracker</button>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="dashboard-logo mb-2">
+                    <div>
+                        <span class="dashboard-date"><i class="bi bi-calendar3"></i> ${new Date().toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' })}</span>
+                        <span class="dashboard-date"><i class="bi bi-clock"></i> ${new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2 mb-3 text-center dashboard-stock-summary">
+            <div class="col-4">
+                <div class="fw-bold text-success">${DB.materialStock.gloves}</div>
+                <div class="small text-muted">Gloves</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold text-success">${DB.materialStock.needles}</div>
+                <div class="small text-muted">Dental Needles</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold text-success">${DB.materialStock.lidocaine}</div>
+                <div class="small text-muted">Lidocaine</div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4 dashboard-kpis">
+            <div class="col-md-3 col-6">
+                <div class="stat-card patients">
+                    <div class="icon"><i class="bi bi-people text-success"></i></div>
+                    <div class="number">${totalPatients}</div>
+                    <div class="label">Total Patients</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card visits">
+                    <div class="icon"><i class="bi bi-clipboard2-pulse text-primary"></i></div>
+                    <div class="number">${totalVisits}</div>
+                    <div class="label">Total Visits</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card revenue">
+                    <div class="icon"><i class="bi bi-cash-stack text-warning"></i></div>
+                    <div class="number">${formatMK(totalRevenue)}</div>
+                    <div class="label">Total Revenue</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card today">
+                    <div class="icon"><i class="bi bi-calendar-day text-danger"></i></div>
+                    <div class="number">${todayVisits}</div>
+                    <div class="label">Today's Visits</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-8">
+                <div class="dashboard-chart">
+                    <h5><i class="bi bi-graph-up"></i> Monthly Overview</h5>
+                    <canvas id="monthlyChart" height="120"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="dashboard-chart">
+                    <h5><i class="bi bi-pie-chart"></i> Procedure Distribution</h5>
+                    <canvas id="procedureChart" height="190"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-expenses">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <h5><i class="bi bi-wallet2"></i> Expense Overview</h5>
+                        <div class="d-flex flex-wrap justify-content-end gap-2">
+                            <button class="btn btn-outline-danger btn-sm dashboard-action-button" onclick="showPage('addExpense')"><i class="bi bi-plus-circle"></i> Add Expense</button>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4"><div class="stat-card revenue"><div class="number">${formatMK(totalExpenses)}</div><div class="label">Total Expenses</div></div></div>
+                        <div class="col-md-4"><div class="stat-card today"><div class="number">${formatMK(todayExpenses)}</div><div class="label">Today's Expenses</div></div></div>
+                        <div class="col-md-4"><div class="stat-card visits"><div class="number">${formatMK(monthExpenses)}</div><div class="label">This Month</div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>`;
+
+    container.innerHTML = html;
+
+    // Draw charts after inserting HTML
+    setTimeout(() => {
+        const ctx1 = document.getElementById('monthlyChart')?.getContext('2d');
+        if (ctx1) {
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: months.map(m => m.label),
+                    datasets: [
+                        { label:'Visits', data: months.map(m => m.visits), backgroundColor:'rgba(45,140,240,0.7)', borderColor:'#2d8cf0', borderWidth:2, borderRadius:5, order:2 },
+                        { label:'Revenue (MK)', data: months.map(m => m.revenue), type:'line', backgroundColor:'rgba(240,147,251,0.1)', borderColor:'#f093fb', borderWidth:3, pointBackgroundColor:'#f093fb', pointRadius:5, fill:true, tension:0.4, order:1, yAxisID:'y1' }
+                    ]
+                },
+                options: {
+                    responsive:true,
+                    plugins: { legend: { position:'top', labels: { usePointStyle:true, padding:20 } } },
+                    scales: {
+                        y: { beginAtZero:true, grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ stepSize:1 } },
+                        y1: { position:'right', beginAtZero:true, grid:{ drawOnChartArea:false }, ticks:{ callback: v => 'MK '+v.toLocaleString() } }
+                    }
+                }
+            });
+        }
+        const ctx2 = document.getElementById('procedureChart')?.getContext('2d');
+        if (ctx2) {
+            new Chart(ctx2, {
+                type:'doughnut',
+                data: {
+                    labels: procLabels.length ? procLabels : ['No Data'],
+                    datasets: [{ data: procData.length ? procData : [1], backgroundColor:['#2d8cf0','#4bc0c0','#ffc107','#ff6b6b','#f093fb','#4caf50','#ff9800','#9c27b0','#00bcd4','#e91e63'], borderColor:'#fff', borderWidth:3 }]
+                },
+                options: { responsive:true, plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, padding:15, font:{ size:11 } } } }, cutout:'65%' }
+            });
+        }
+    }, 100);
+}
+
+/* ---------- ADD PATIENT ---------- */
+function renderAddPatient(container) {
+    container.innerHTML = `
+    <div class="main-card compact-form-card" style="max-width:350px;">
+        <h3 class="mb-4"><i class="bi bi-person-plus"></i> Register New Patient</h3>
+        <form id="addPatientForm">
+            <div class="mb-3">
+                <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="patName" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="patPhone" placeholder="e.g., 0992239889">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Address</label>
+                <textarea class="form-control" id="patAddress" rows="2"></textarea>
+            </div>
+            <div class="compact-form-actions">
+                <button type="submit" class="btn btn-success w-100 btn-action"><i class="bi bi-save"></i> Register Patient</button>
+                <a href="#" class="btn btn-secondary w-100 btn-action" onclick="showPage('dashboard');return false;">Cancel</a>
+            </div>
+        </form>
+    </div>`;
+
+    document.getElementById('addPatientForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('patName').value.trim();
+        if (!name) return alert('Patient name is required');
+        const phone = document.getElementById('patPhone').value.trim();
+        const address = document.getElementById('patAddress').value.trim();
+
+        const newPatient = {
+            id: DB.nextPatientId++,
+            name, phone, address,
+            created: new Date().toISOString().slice(0,10)
+        };
+        DB.patients.push(newPatient);
+        saveDB();
+        showPage('addVisit', newPatient.id);
+    });
+}
+
+/* ---------- ADD VISIT ---------- */
+function renderAddVisit(container, preselectedPatientId) {
+    const patientId = preselectedPatientId ? Number(preselectedPatientId) : 0;
+    const patientOptions = DB.patients.map(p =>
+        `<option value="${p.id}" ${p.id === patientId ? 'selected' : ''}>${p.name} – ${p.phone || ''}</option>`
+    ).join('');
+
+    container.innerHTML = `
+    <div class="main-card compact-form-card treatment-form-card">
+        <h3 class="mb-4"><i class="bi bi-plus-circle"></i> Add Treatment / Visit</h3>
+        <form id="addVisitForm">
+            <div class="mb-3">
+                <label class="form-label">Select Patient <span class="text-danger">*</span></label>
+                <select class="form-select" id="visitPatient" required ${patientId ? 'disabled' : ''}>
+                    <option value="">Choose a patient...</option>
+                    ${patientOptions}
+                </select>
+                ${patientId ? `<input type="hidden" id="visitPatientHidden" value="${patientId}">` : ''}
+                <small class="text-muted"><a href="#" onclick="showPage('addPatient');return false;">New patient? Register here</a></small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Treatment / Procedure <span class="text-danger">*</span></label>
+                <select class="form-select" id="visitProcedure" required>
+                    <option value="">Select Treatment...</option>
+                    ${DB.procedures.map(p => `<option value="${p.id}" data-price="${p.price}">${p.name} – ${formatMK(p.price)}</option>`).join('')}
+                </select>
+            </div>
+            <div class="treatment-value-row">
+                <div class="mb-3">
+                    <label class="form-label">Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="visitDate" value="${new Date().toISOString().slice(0,10)}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Amount (MK) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="visitAmount" min="0" step="100" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Notes</label>
+                <textarea class="form-control" id="visitNotes" rows="2"></textarea>
+            </div>
+            <div class="compact-form-actions">
+                <button type="submit" class="btn btn-primary w-100 btn-action"><i class="bi bi-save"></i> Save Treatment</button>
+                <a href="#" class="btn btn-secondary w-100 btn-action" onclick="showPage('dashboard');return false;">Cancel</a>
+            </div>
+        </form>
+    </div>`;
+
+    const procSelect = document.getElementById('visitProcedure');
+    const amountInput = document.getElementById('visitAmount');
+    procSelect.addEventListener('change', function() {
+        const opt = this.selectedOptions[0];
+        if (opt && opt.dataset.price) amountInput.value = opt.dataset.price;
+    });
+
+    document.getElementById('addVisitForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const patientId = document.getElementById('visitPatientHidden')?.value || document.getElementById('visitPatient').value;
+        const procedureId = Number(procSelect.value);
+        const visitDate = document.getElementById('visitDate').value;
+        const amount = Number(amountInput.value);
+        const notes = document.getElementById('visitNotes').value.trim();
+
+        if (!patientId || !procedureId || !visitDate || amount <= 0) return alert('Please fill all required fields');
+
+        const newVisit = {
+            id: DB.nextVisitId++,
+            patient_id: Number(patientId),
+            procedure_id: procedureId,
+            visit_date: visitDate,
+            amount: amount,
+            notes: notes
+        };
+        DB.visits.push(newVisit);
+        saveDB();
+        showPage('receipt', newVisit.id);
+    });
+}
+
+/* ---------- ADD EXPENSE ---------- */
+function renderAddExpense(container) {
+    container.innerHTML = `
+    <div class="main-card compact-form-card" style="max-width:600px;">
+        <h3 class="mb-4"><i class="bi bi-wallet2"></i> Add Expense</h3>
+        <form id="addExpenseForm">
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label class="form-label">Expense Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="expTitle" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Category <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="expCategory" placeholder="e.g. Supplies, Rent" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Amount (MK) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="expAmount" min="0.01" step="0.01" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Expense Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="expDate" value="${new Date().toISOString().slice(0,10)}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-select" id="expMethod">
+                        <option>Cash</option><option>Card</option><option>Mobile Money</option><option>Bank Transfer</option><option>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Notes</label>
+                    <input type="text" class="form-control" id="expNotes">
+                </div>
+            </div>
+            <div class="compact-form-actions mt-3">
+                <button type="submit" class="btn btn-danger w-100 btn-action"><i class="bi bi-save"></i> Save Expense</button>
+                <a href="#" class="btn btn-outline-secondary w-100 btn-action" onclick="showPage('dashboard');return false;">Cancel</a>
+            </div>
+        </form>
+    </div>`;
+
+    document.getElementById('addExpenseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const title = document.getElementById('expTitle').value.trim();
+        const category = document.getElementById('expCategory').value.trim();
+        const amount = Number(document.getElementById('expAmount').value);
+        const expense_date = document.getElementById('expDate').value;
+        const payment_method = document.getElementById('expMethod').value;
+        const notes = document.getElementById('expNotes').value.trim();
+
+        if (!title || !category || amount <= 0 || !expense_date) return alert('Please fill all required fields');
+
+        const newExpense = {
+            id: DB.nextExpenseId++,
+            title, category, amount, expense_date, payment_method, notes
+        };
+        DB.expenses.push(newExpense);
+        saveDB();
+        showPage('expenseReceipt', newExpense.id);
+    });
+}
+
+/* ---------- MATERIALS TRACKER ---------- */
+function renderMaterialsTracker(container) {
+    const records = [...DB.materials].sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.id - a.id);
+    const stockIns = [...DB.stockIns].sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.id - a.id);
+    const patientOptions = [...new Set(DB.patients.map(patient => patient.name))]
+        .map(name => `<option value="${escapeHtml(name)}"></option>`).join('');
+
+    container.innerHTML = `
+    <div class="main-card">
+        <h3 class="mb-3"><i class="bi bi-box-seam"></i> Materials Tracker</h3>
+        <h5 class="mb-3">Current Stock</h5>
+        <div class="row g-2 mb-4">
+            <div class="col-4"><div class="stat-box text-center p-2 bg-light rounded"><div class="fs-5 fw-bold text-success">${DB.materialStock.gloves}</div><div class="small text-muted">Gloves (pairs)</div></div></div>
+            <div class="col-4"><div class="stat-box text-center p-2 bg-light rounded"><div class="fs-5 fw-bold text-success">${DB.materialStock.needles}</div><div class="small text-muted">Dental needles</div></div></div>
+            <div class="col-4"><div class="stat-box text-center p-2 bg-light rounded"><div class="fs-5 fw-bold text-success">${DB.materialStock.lidocaine}</div><div class="small text-muted">Lidocaine</div></div></div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm btn-action mb-4 no-print" onclick="showPage('materialCurrentStockReceipt')"><i class="bi bi-printer"></i> Print Current Stock</button>
+
+        <h5 class="mb-3">Edit Current Stock</h5>
+        <form id="editMaterialStockForm" class="mb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-4">
+                    <label class="form-label" for="editStockGloves">Gloves (pairs)</label>
+                    <input type="number" class="form-control" id="editStockGloves" min="0" step="1" value="${DB.materialStock.gloves}" inputmode="numeric" required>
+                </div>
+                <div class="col-6 col-md-4">
+                    <label class="form-label" for="editStockNeedles">Dental needles</label>
+                    <input type="number" class="form-control" id="editStockNeedles" min="0" step="1" value="${DB.materialStock.needles}" inputmode="numeric" required>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="editStockLidocaine">Lidocaine</label>
+                    <input type="number" class="form-control" id="editStockLidocaine" min="0" step="1" value="${DB.materialStock.lidocaine}" inputmode="numeric" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-primary btn-action mt-3"><i class="bi bi-pencil-square"></i> Save Stock Balance</button>
+        </form>
+
+        <h5 class="mb-3">Add Stock</h5>
+        <form id="materialStockForm" class="mb-4">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="stockDate">Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="stockDate" value="${new Date().toISOString().slice(0,10)}" required>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label" for="stockGloves">Gloves (pairs)</label>
+                    <input type="number" class="form-control" id="stockGloves" min="0" step="1" value="0" inputmode="numeric">
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label" for="stockNeedles">Dental needles</label>
+                    <input type="number" class="form-control" id="stockNeedles" min="0" step="1" value="0" inputmode="numeric">
+                </div>
+                <div class="col-12 col-md-2">
+                    <label class="form-label" for="stockLidocaine">Lidocaine</label>
+                    <input type="number" class="form-control" id="stockLidocaine" min="0" step="1" value="0" inputmode="numeric">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-action mt-3"><i class="bi bi-plus-circle"></i> Add Stock</button>
+        </form>
+
+        <h5 class="mb-3">Stock-In History</h5>
+        <div class="table-responsive mb-4">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark"><tr><th>Date</th><th>Gloves</th><th>Dental Needles</th><th>Lidocaine</th><th class="no-print">Receipt</th></tr></thead>
+                <tbody>
+                    ${stockIns.map(entry => `
+                        <tr>
+                            <td>${escapeHtml(formatDate(entry.date))}</td>
+                            <td>${Number(entry.gloves) || 0}</td>
+                            <td>${Number(entry.needles) || 0}</td>
+                            <td>${Number(entry.lidocaine) || 0}</td>
+                            <td class="no-print"><button type="button" class="btn btn-sm btn-outline-primary" onclick="showPage('materialStockReceipt', ${entry.id})"><i class="bi bi-printer"></i> Print</button></td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="5" class="text-center text-muted">No stock added yet</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+
+        <h5 class="mb-3">Record Materials Used</h5>
+        <form id="materialsForm" class="mb-4">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="materialPatient">Patient Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="materialPatient" list="materialPatientOptions" required maxlength="120" autocomplete="off">
+                    <datalist id="materialPatientOptions">${patientOptions}</datalist>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="materialDate">Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="materialDate" value="${new Date().toISOString().slice(0,10)}" required>
+                </div>
+                <div class="col-6 col-md-4">
+                    <label class="form-label" for="materialGloves">Gloves (pairs)</label>
+                    <input type="number" class="form-control" id="materialGloves" min="0" step="1" value="0" inputmode="numeric">
+                </div>
+                <div class="col-6 col-md-4">
+                    <label class="form-label" for="materialNeedles">Dental Needles (units)</label>
+                    <input type="number" class="form-control" id="materialNeedles" min="0" step="1" value="0" inputmode="numeric">
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="materialLidocaine">Lidocaine (units)</label>
+                    <input type="number" class="form-control" id="materialLidocaine" min="0" step="1" value="0" inputmode="numeric">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-action mt-3"><i class="bi bi-save"></i> Save Materials Used</button>
+        </form>
+        <h5 class="mb-3">Usage History</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark"><tr><th>Date</th><th>Patient</th><th>Gloves (pairs)</th><th>Dental Needles</th><th>Lidocaine</th><th class="no-print">Actions</th></tr></thead>
+                <tbody>
+                    ${records.map(record => `
+                        <tr>
+                            <td>${escapeHtml(formatDate(record.date))}</td>
+                            <td>${escapeHtml(record.patientName)}</td>
+                            <td>${Number(record.gloves) || 0}</td>
+                            <td>${Number(record.needles) || 0}</td>
+                            <td>${Number(record.lidocaine) || 0}</td>
+                            <td class="no-print">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="showPage('materialReceipt', ${record.id})" aria-label="Print materials receipt"><i class="bi bi-printer"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteMaterialRecord(${record.id})" aria-label="Delete materials record"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="6" class="text-center text-muted">No materials used recorded yet</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    </div>`;
+
+    document.getElementById('editMaterialStockForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const gloves = Number(document.getElementById('editStockGloves').value);
+        const needles = Number(document.getElementById('editStockNeedles').value);
+        const lidocaine = Number(document.getElementById('editStockLidocaine').value);
+        if (![gloves, needles, lidocaine].every(quantity => Number.isInteger(quantity) && quantity >= 0)) {
+            return alert('Stock balances must be whole numbers of zero or more.');
+        }
+        DB.materialStock = { gloves, needles, lidocaine };
+        saveDB();
+        renderMaterialsTracker(document.getElementById('appContainer'));
+    });
+
+    document.getElementById('materialStockForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const date = document.getElementById('stockDate').value;
+        const gloves = Number(document.getElementById('stockGloves').value);
+        const needles = Number(document.getElementById('stockNeedles').value);
+        const lidocaine = Number(document.getElementById('stockLidocaine').value);
+        if (!date) return alert('Please enter a stock date.');
+        if (![gloves, needles, lidocaine].every(quantity => Number.isInteger(quantity) && quantity >= 0)) {
+            return alert('Stock quantities must be whole numbers of zero or more.');
+        }
+        if (gloves + needles + lidocaine === 0) return alert('Enter at least one stock quantity.');
+
+        const entry = { id: DB.nextStockInId++, date, gloves, needles, lidocaine };
+        DB.stockIns.push(entry);
+        DB.materialStock.gloves += gloves;
+        DB.materialStock.needles += needles;
+        DB.materialStock.lidocaine += lidocaine;
+        saveDB();
+        showPage('materialStockReceipt', entry.id);
+    });
+
+    document.getElementById('materialsForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const patientName = document.getElementById('materialPatient').value.trim();
+        const date = document.getElementById('materialDate').value;
+        const gloves = Number(document.getElementById('materialGloves').value);
+        const needles = Number(document.getElementById('materialNeedles').value);
+        const lidocaine = Number(document.getElementById('materialLidocaine').value);
+        if (!patientName || !date) return alert('Please enter a patient name and date.');
+        if (![gloves, needles, lidocaine].every(quantity => Number.isInteger(quantity) && quantity >= 0)) {
+            return alert('Material quantities must be whole numbers of zero or more.');
+        }
+        if (gloves + needles + lidocaine === 0) return alert('Enter at least one material quantity.');
+        const insufficient = [
+            gloves > DB.materialStock.gloves ? 'gloves' : '',
+            needles > DB.materialStock.needles ? 'dental needles' : '',
+            lidocaine > DB.materialStock.lidocaine ? 'lidocaine' : ''
+        ].filter(Boolean);
+        if (insufficient.length) return alert('Not enough stock for: ' + insufficient.join(', ') + '. Add stock first.');
+
+        const record = { id: DB.nextMaterialId++, patientName, date, gloves, needles, lidocaine };
+        DB.materials.push(record);
+        DB.materialStock.gloves -= gloves;
+        DB.materialStock.needles -= needles;
+        DB.materialStock.lidocaine -= lidocaine;
+        saveDB();
+        showPage('materialReceipt', record.id);
+    });
+}
+
+function deleteMaterialRecord(id) {
+    const record = DB.materials.find(item => item.id === id);
+    if (!record || !confirm('Delete this materials record and return its quantities to stock?')) return;
+    DB.materialStock.gloves += Number(record.gloves) || 0;
+    DB.materialStock.needles += Number(record.needles) || 0;
+    DB.materialStock.lidocaine += Number(record.lidocaine) || 0;
+    DB.materials = DB.materials.filter(item => item.id !== id);
+    saveDB();
+    showPage('materials');
+}
+
+function renderMaterialReceipt(container, recordId, isStockIn, isCurrentStock = false) {
+    const records = isStockIn ? DB.stockIns : DB.materials;
+    const record = isCurrentStock
+        ? { date: new Date().toISOString().slice(0,10), ...DB.materialStock }
+        : records.find(item => item.id === Number(recordId));
+    if (!record) {
+        showPage('materials');
+        return;
+    }
+    const receiptTitle = isStockIn ? 'Materials Stock-In Receipt' : isCurrentStock ? 'Current Materials Stock Receipt' : 'Materials Used Receipt';
+    const receiptNumber = isCurrentStock
+        ? 'CS-' + record.date.replace(/-/g, '')
+        : (isStockIn ? 'ST-' : 'MU-') + String(record.id).padStart(6, '0');
+    const materialRows = [
+        ['Gloves (pairs)', record.gloves],
+        ['Dental Needles', record.needles],
+        ['Lidocaine', record.lidocaine]
+    ].map(([label, quantity]) => `
+        <div class="d-flex justify-content-between border-bottom py-2">
+            <span class="fw-bold">${label}</span><span>${Number(quantity) || 0}</span>
+        </div>`).join('');
+
+    container.innerHTML = `
+    <div class="receipt-card">
+        <div class="receipt-header text-center border-bottom pb-3 mb-3">
+            <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="receipt-logo">
+            <h2>HAPPY TOOTH DENTAL</h2>
+            <h4>${receiptTitle}</h4>
+            <p class="small"><strong>Receipt #:</strong> ${receiptNumber} | <strong>Date:</strong> ${escapeHtml(formatDate(record.date))}</p>
+        </div>
+        <div class="receipt-body">
+            ${!isStockIn && !isCurrentStock ? `<div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Patient</span><span>${escapeHtml(record.patientName)}</span></div>` : ''}
+            ${materialRows}
+        </div>
+        <div class="receipt-footer text-center mt-3 pt-3 border-top border-dashed">
+            <p>${isStockIn ? 'Stock received and added to inventory.' : isCurrentStock ? 'Current available stock balance.' : 'Materials recorded for patient use.'}</p>
+        </div>
+    </div>
+    <div class="text-center mt-3 no-print">
+        <button class="btn btn-primary btn-action" onclick="window.print()"><i class="bi bi-printer"></i> Print Receipt</button>
+        <button class="btn btn-secondary btn-action" onclick="showPage('materials')"><i class="bi bi-arrow-left"></i> Back to Materials</button>
+    </div>`;
+}
+
+/* ---------- PATIENTS LIST ---------- */
+function renderPatients(container) {
+    const patients = DB.patients;
+    const rows = patients.map((p, idx) => {
+        const visits = DB.visits.filter(v => v.patient_id === p.id);
+        const totalSpent = visits.reduce((s,v) => s + v.amount, 0);
+        return `
+        <tr>
+            <td>${idx+1}</td>
+            <td>${p.name}</td>
+            <td>${p.phone || '—'}</td>
+            <td><span class="badge bg-info">${visits.length}</span></td>
+            <td>${formatMK(totalSpent)}</td>
+            <td class="no-print">
+                <button class="btn btn-sm btn-primary" onclick="showPage('patientHistory', ${p.id})"><i class="bi bi-eye"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="deletePatient(${p.id})"><i class="bi bi-trash"></i></button>
+            </td>
+        </tr>`;
+    }).join('');
+
+    container.innerHTML = `
+    <div class="main-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3><i class="bi bi-people"></i> All Patients</h3>
+            <div>
+                <button class="btn btn-success btn-action" onclick="showPage('addPatient')"><i class="bi bi-person-plus"></i> New Patient</button>
+                <button class="btn btn-warning btn-action" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark"><tr><th>#</th><th>Name</th><th>Phone</th><th>Visits</th><th>Total Spent</th><th class="no-print">Actions</th></tr></thead>
+                <tbody>${rows || '<tr><td colspan="6" class="text-center text-muted">No patients found</td></tr>'}</tbody>
+            </table>
+        </div>
+    </div>`;
+}
+function deletePatient(id) {
+    if (!confirm('Delete this patient and all their visits?')) return;
+    DB.patients = DB.patients.filter(p => p.id !== id);
+    DB.visits = DB.visits.filter(v => v.patient_id !== id);
+    saveDB();
+    showPage('patients');
+}
+
+/* ---------- PATIENT HISTORY ---------- */
+function renderPatientHistory(container, patientId) {
+    const pid = Number(patientId);
+    const patient = DB.patients.find(p => p.id === pid);
+    if (!patient) { showPage('patients'); return; }
+    const visits = DB.visits.filter(v => v.patient_id === pid);
+    const totalSpent = visits.reduce((s,v) => s + v.amount, 0);
+    const avg = visits.length ? totalSpent / visits.length : 0;
+
+    container.innerHTML = `
+    <div class="main-card">
+        <div class="patient-info mb-4 p-3" style="background:#f8f9fa; border-left:5px solid #2d8cf0; border-radius:12px;">
+            <h4><i class="bi bi-person-circle"></i> ${patient.name}</h4>
+            <p class="mb-0"><i class="bi bi-telephone"></i> ${patient.phone || '—'}</p>
+            ${patient.address ? `<p class="mb-0"><i class="bi bi-geo-alt"></i> ${patient.address}</p>` : ''}
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-4"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${visits.length}</div><div class="text-muted">Total Visits</div></div></div>
+            <div class="col-md-4"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${formatMK(totalSpent)}</div><div class="text-muted">Total Spent</div></div></div>
+            <div class="col-md-4"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${formatMK(avg)}</div><div class="text-muted">Average per Visit</div></div></div>
+        </div>
+        <h5><i class="bi bi-clock-history"></i> Visit History</h5>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark"><tr><th>#</th><th>Procedure</th><th>Date</th><th class="text-end">Amount</th><th>Notes</th><th>Action</th></tr></thead>
+                <tbody>
+                    ${visits.map((v,i) => `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${getProcedureName(v.procedure_id)}</td>
+                            <td>${formatDate(v.visit_date)}</td>
+                            <td class="text-end">${formatMK(v.amount)}</td>
+                            <td>${v.notes || ''}</td>
+                            <td><button class="btn btn-sm btn-outline-primary" onclick="showPage('receipt', ${v.id})"><i class="bi bi-receipt"></i></button></td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="6" class="text-center text-muted">No visits recorded</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+        <button class="btn btn-secondary mt-3" onclick="showPage('patients')"><i class="bi bi-arrow-left"></i> Back to Patients</button>
+    </div>`;
+}
+
+/* ---------- VISITS LIST ---------- */
+function renderVisits(container) {
+    const visits = [...DB.visits].sort((a,b) => new Date(b.visit_date) - new Date(a.visit_date));
+    const totalRevenue = visits.reduce((s,v) => s + v.amount, 0);
+    const uniquePatients = new Set(visits.map(v => v.patient_id)).size;
+    const avg = visits.length ? totalRevenue / visits.length : 0;
+
+    container.innerHTML = `
+    <div class="main-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3><i class="bi bi-clock-history"></i> All Visits</h3>
+            <div>
+                <button class="btn btn-success btn-action" onclick="showPage('addVisit')"><i class="bi bi-plus-circle"></i> New Visit</button>
+                <button class="btn btn-secondary btn-action" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-3 col-6"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${visits.length}</div><div class="text-muted">Total Visits</div></div></div>
+            <div class="col-md-3 col-6"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${formatMK(totalRevenue)}</div><div class="text-muted">Total Revenue</div></div></div>
+            <div class="col-md-3 col-6"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${uniquePatients}</div><div class="text-muted">Unique Patients</div></div></div>
+            <div class="col-md-3 col-6"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${formatMK(avg)}</div><div class="text-muted">Avg Amount</div></div></div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark"><tr><th>#</th><th>Patient</th><th>Phone</th><th>Procedure</th><th>Date</th><th class="text-end">Amount</th><th>Actions</th></tr></thead>
+                <tbody>
+                    ${visits.map((v,i) => `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${getPatientName(v.patient_id)}</td>
+                            <td>${getPatientPhone(v.patient_id)}</td>
+                            <td><span class="badge bg-primary">${getProcedureName(v.procedure_id)}</span></td>
+                            <td>${formatDate(v.visit_date)}</td>
+                            <td class="text-end">${formatMK(v.amount)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="showPage('receipt', ${v.id})"><i class="bi bi-receipt"></i></button>
+                                <button class="btn btn-sm btn-outline-info" onclick="showPage('patientHistory', ${v.patient_id})"><i class="bi bi-person"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteVisit(${v.id})"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="7" class="text-center text-muted">No visits found</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    </div>`;
+}
+function deleteVisit(id) {
+    if (!confirm('Delete this visit?')) return;
+    DB.visits = DB.visits.filter(v => v.id !== id);
+    saveDB();
+    showPage('visits');
+}
+
+/* ---------- EXPENSES LIST ---------- */
+function renderExpenses(container) {
+    const expenses = [...DB.expenses].sort((a,b) => new Date(b.expense_date) - new Date(a.expense_date));
+    const total = expenses.reduce((s,e) => s + e.amount, 0);
+
+    container.innerHTML = `
+    <div class="main-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3><i class="bi bi-wallet2"></i> All Expenses</h3>
+            <div>
+                <button class="btn btn-danger btn-action" onclick="showPage('addExpense')"><i class="bi bi-plus-circle"></i> Add Expense</button>
+                <button class="btn btn-outline-dark btn-action" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
+            </div>
+        </div>
+        <div class="stat-box mb-3 p-3 bg-light rounded">
+            <h6 class="text-muted">Total Expenses</h6>
+            <h3 class="text-danger">${formatMK(total)}</h3>
+            <small class="text-muted">${expenses.length} records</small>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark"><tr><th>#</th><th>Title</th><th>Category</th><th>Date</th><th>Method</th><th class="text-end">Amount</th><th>Actions</th></tr></thead>
+                <tbody>
+                    ${expenses.map((e,i) => `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${e.title}</td>
+                            <td>${e.category}</td>
+                            <td>${formatDate(e.expense_date)}</td>
+                            <td>${e.payment_method || 'Cash'}</td>
+                            <td class="text-end text-danger fw-bold">${formatMK(e.amount)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="showPage('expenseReceipt', ${e.id})"><i class="bi bi-printer"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteExpense(${e.id})"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="7" class="text-center text-muted">No expenses found</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    </div>`;
+}
+function deleteExpense(id) {
+    if (!confirm('Delete this expense?')) return;
+    DB.expenses = DB.expenses.filter(e => e.id !== id);
+    saveDB();
+    showPage('expenses');
+}
+
+/* ---------- RECEIPT (Visit) ---------- */
+function renderReceipt(container, visitId) {
+    const vid = Number(visitId);
+    const visit = DB.visits.find(v => v.id === vid);
+    if (!visit) { showPage('visits'); return; }
+    const patient = DB.patients.find(p => p.id === visit.patient_id);
+    const procedure = DB.procedures.find(p => p.id === visit.procedure_id);
+
+    container.innerHTML = `
+    <div class="receipt-card" id="receiptContent">
+        <div class="receipt-header text-center border-bottom pb-3 mb-3">
+            <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="receipt-logo">
+            <h2>HAPPY TOOTH DENTAL</h2>
+            <p class="small mb-0"><i class="bi bi-geo-alt"></i> Lilongwe Area 25C near Nazareen Church, EML Complex</p>
+            <p class="small mb-0"><i class="bi bi-telephone"></i> 0992239889 OR WHATSAPP 0882407607</p>
+            <p class="small"><strong>Receipt #:</strong> ${String(visit.id).padStart(6,'0')} | <strong>Date:</strong> ${formatDate(visit.visit_date)}</p>
+        </div>
+        <div class="receipt-body">
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Patient</span><span>${patient ? patient.name : 'Unknown'}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Phone</span><span>${patient ? patient.phone || '—' : '—'}</span></div>
+            ${visit.notes ? `<div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Notes</span><span>${visit.notes}</span></div>` : ''}
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">${procedure ? procedure.name : 'Procedure'}</span><span>${formatMK(visit.amount)}</span></div>
+            <div class="d-flex justify-content-between pt-3 mt-2 border-top border-2 border-success"><span class="fw-bold fs-5">TOTAL</span><span class="fw-bold fs-5 text-success">${formatMK(visit.amount)}</span></div>
+            <div class="d-flex justify-content-between py-2"><span class="fw-bold">Payment</span><span>Paid (Cash)</span></div>
+        </div>
+        <div class="receipt-footer text-center mt-3 pt-3 border-top border-dashed">
+            <p>Thank you for choosing HAPPY TOOTH DENTAL</p>
+            <div class="signature-line mt-3 pt-2 border-top">
+                <span>Signed by:</span>
+                <strong>Kenneth Chirambo</strong>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3 no-print">
+        <button class="btn btn-primary btn-action" onclick="window.print()"><i class="bi bi-printer"></i> Print Receipt</button>
+        <button class="btn btn-secondary btn-action" onclick="showPage('dashboard')"><i class="bi bi-house"></i> Dashboard</button>
+    </div>`;
+}
+
+/* ---------- EXPENSE RECEIPT ---------- */
+function renderExpenseReceipt(container, expenseId) {
+    const eid = Number(expenseId);
+    const expense = DB.expenses.find(e => e.id === eid);
+    if (!expense) { showPage('expenses'); return; }
+    const sameDayTotal = DB.expenses.filter(e => e.expense_date === expense.expense_date).reduce((s,e) => s + e.amount, 0);
+
+    container.innerHTML = `
+    <div class="receipt-card">
+        <div class="receipt-header text-center border-bottom pb-3 mb-3">
+            <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="receipt-logo">
+            <h2>HAPPY TOOTH DENTAL</h2>
+            <p class="small mb-0"><i class="bi bi-geo-alt"></i> Lilongwe Area 25C near Nazareen Church, EML Complex</p>
+            <p class="small mb-0"><i class="bi bi-telephone"></i> 0992239889 OR WHATSAPP 0882407607</p>
+        </div>
+        <div class="receipt-body">
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Expense ID</span><span>#${String(expense.id).padStart(6,'0')}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Title</span><span>${expense.title}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Category</span><span>${expense.category}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Date</span><span>${formatDate(expense.expense_date)}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Payment</span><span>${expense.payment_method || 'Cash'}</span></div>
+            ${expense.notes ? `<div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Notes</span><span>${expense.notes}</span></div>` : ''}
+            <div class="d-flex justify-content-between pt-3 mt-2 border-top border-2 border-danger"><span class="fw-bold fs-5">Total Expenses for This Date</span><span class="fw-bold fs-5 text-danger">${formatMK(sameDayTotal)}</span></div>
+        </div>
+        <div class="receipt-footer text-center mt-3 pt-3 border-top border-dashed">
+            <p>Thank you for your business.</p>
+            <div class="signature-line mt-3 pt-2 border-top">
+                <span>Signed by:</span>
+                <strong>KENNETH CHIRAMBO</strong>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3 no-print">
+        <button class="btn btn-primary btn-action" onclick="window.print()"><i class="bi bi-printer"></i> Print Receipt</button>
+        <button class="btn btn-secondary btn-action" onclick="showPage('expenses')"><i class="bi bi-arrow-left"></i> Back to Expenses</button>
+    </div>`;
+}
+
+/* ---------- MANAGE MONTHS ---------- */
+function renderManageMonths(container) {
+    const now = new Date();
+    const currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    const visitsThisMonth = DB.visits.filter(v => v.visit_date.startsWith(currentMonth));
+    const expensesThisMonth = DB.expenses.filter(e => e.expense_date.startsWith(currentMonth));
+    const revenue = visitsThisMonth.reduce((s,v) => s + v.amount, 0);
+    const expenseTotal = expensesThisMonth.reduce((s,e) => s + e.amount, 0);
+    const patients = new Set(visitsThisMonth.map(v => v.patient_id)).size;
+    const archivedMonths = [...DB.archives].sort((a, b) => a.archiveNumber - b.archiveNumber);
+
+    container.innerHTML = `
+    <div class="main-card">
+        <h3><i class="bi bi-calendar-check"></i> Monthly Management</h3>
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">Current Month – ${now.toLocaleString('default', { month:'long', year:'numeric' })}</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${patients}</div><div class="text-muted">Patients</div></div></div>
+                    <div class="col-md-3"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${visitsThisMonth.length}</div><div class="text-muted">Visits</div></div></div>
+                    <div class="col-md-3"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${formatMK(revenue)}</div><div class="text-muted">Revenue</div></div></div>
+                    <div class="col-md-3"><div class="stat-box text-center p-3 bg-light rounded"><div class="fs-4 fw-bold">${formatMK(expenseTotal)}</div><div class="text-muted">Expenses</div></div></div>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-danger me-2" onclick="showPage('monthlyReport', '${currentMonth}')"><i class="bi bi-file-earmark-text"></i> Print Monthly Report</button>
+                    <button class="btn btn-outline-danger" onclick="showPage('monthlyExpenses', '${currentMonth}')"><i class="bi bi-wallet2"></i> Print Monthly Expenses</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-success text-white">Archived Months <span class="badge bg-light text-success">${archivedMonths.length}</span></div>
+            <div class="card-body">
+                <p class="text-muted">Save a monthly snapshot for future tracking. Your current records will remain available.</p>
+                <button class="btn btn-outline-secondary mb-3" onclick="archiveCurrentMonth()">
+                    <i class="bi bi-archive"></i> Save Monthly Archive
+                </button>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped align-middle mb-0">
+                        <thead><tr><th>Archive #</th><th>Month</th><th>Archived</th><th>Patients</th><th>Visits</th><th>Revenue</th><th>Expenses</th><th class="no-print">Actions</th></tr></thead>
+                        <tbody>
+                            ${archivedMonths.map(archive => {
+                                const [year, month] = archive.month.split('-').map(Number);
+                                return `<tr>
+                                    <td>${archive.archiveNumber}</td>
+                                    <td>${new Date(year, month - 1, 1).toLocaleString('default', { month:'long', year:'numeric' })}</td>
+                                    <td>${new Date(archive.archivedAt).toLocaleDateString('en-GB')}</td>
+                                    <td>${archive.patientCount}</td>
+                                    <td>${archive.visitCount}</td>
+                                    <td>${formatMK(archive.revenue)}</td>
+                                    <td>${formatMK(archive.expenses)}</td>
+                                    <td class="no-print">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="showPage('archiveReport', ${archive.archiveNumber})"><i class="bi bi-printer"></i> Print</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteArchivedMonth(${archive.archiveNumber})" title="Delete archived snapshot"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>`;
+                            }).join('') || '<tr><td colspan="8" class="text-center text-muted">No archived months yet</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderArchiveReport(container, archiveNumber) {
+    const archive = DB.archives.find(item => item.archiveNumber === Number(archiveNumber));
+    if (!archive) {
+        showPage('manageMonths');
+        return;
+    }
+
+    const [year, month] = archive.month.split('-').map(Number);
+    const monthLabel = new Date(year, month - 1, 1).toLocaleString('default', { month:'long', year:'numeric' });
+    const netProfit = archive.revenue - archive.expenses;
+    const archivedDate = archive.archivedAt ? new Date(archive.archivedAt).toLocaleDateString('en-GB') : '—';
+
+    container.innerHTML = `
+    <div class="receipt-card">
+        <div class="receipt-header text-center border-bottom pb-3 mb-3">
+            <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="receipt-logo">
+            <h2>HAPPY TOOTH DENTAL</h2>
+            <h4>Monthly Archive</h4>
+            <p class="fw-bold">Archive #${archive.archiveNumber}</p>
+            <p class="mb-1">${monthLabel}</p>
+            <p class="small text-muted mb-0">Archived on ${archivedDate}</p>
+        </div>
+        <div class="receipt-body">
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Patients treated</span><span>${archive.patientCount}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Visits</span><span>${archive.visitCount}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Expenses recorded</span><span>${archive.expenseCount}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Revenue</span><span>${formatMK(archive.revenue)}</span></div>
+            <div class="d-flex justify-content-between border-bottom py-2"><span class="fw-bold">Expenses</span><span>${formatMK(archive.expenses)}</span></div>
+            <div class="d-flex justify-content-between pt-3 mt-2 border-top border-2 border-success"><span class="fw-bold">Net</span><span class="fw-bold text-success">${formatMK(netProfit)}</span></div>
+        </div>
+        <div class="text-center mt-3 no-print">
+            <button class="btn btn-primary btn-action" onclick="window.print()"><i class="bi bi-printer"></i> Print Archive</button>
+            <button class="btn btn-secondary btn-action" onclick="showPage('manageMonths')"><i class="bi bi-arrow-left"></i> Back to Archives</button>
+        </div>
+    </div>`;
+}
+
+/* ---------- MONTHLY REPORT ---------- */
+function renderMonthlyReport(container, month) {
+    const [year, mon] = month.split('-').map(Number);
+    const monthVisits = DB.visits.filter(v => {
+        const d = new Date(v.visit_date);
+        return d.getFullYear() === year && d.getMonth()+1 === mon;
+    });
+    const monthExpenses = DB.expenses.filter(e => {
+        const d = new Date(e.expense_date);
+        return d.getFullYear() === year && d.getMonth()+1 === mon;
+    });
+    const totalRevenue = monthVisits.reduce((s,v) => s + v.amount, 0);
+    const totalExpenses = monthExpenses.reduce((s,e) => s + e.amount, 0);
+    const netProfit = totalRevenue - totalExpenses;
+    const patientCount = new Set(monthVisits.map(v => v.patient_id)).size;
+
+    container.innerHTML = `
+    <div class="main-card">
+        <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="receipt-logo">
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <h2>HAPPY TOOTH DENTAL</h2>
+                <h5>Monthly Financial Report – ${new Date(year, mon-1).toLocaleString('default', { month:'long', year:'numeric' })}</h5>
+            </div>
+            <div class="no-print">
+                <button class="btn btn-secondary" onclick="showPage('manageMonths')">Back</button>
+                <button class="btn btn-primary" onclick="window.print()">Print</button>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-3"><div class="summary-card p-3 bg-light rounded"><div class="text-muted small">Patients</div><div class="fs-4 fw-bold">${patientCount}</div></div></div>
+            <div class="col-md-3"><div class="summary-card p-3 bg-light rounded"><div class="text-muted small">Visits</div><div class="fs-4 fw-bold">${monthVisits.length}</div></div></div>
+            <div class="col-md-3"><div class="summary-card p-3 bg-light rounded"><div class="text-muted small">Revenue</div><div class="fs-4 fw-bold">${formatMK(totalRevenue)}</div></div></div>
+            <div class="col-md-3"><div class="summary-card p-3 bg-light rounded"><div class="text-muted small">Expenses</div><div class="fs-4 fw-bold">${formatMK(totalExpenses)}</div></div></div>
+        </div>
+        <div class="alert alert-info d-flex justify-content-between">
+            <span><strong>Net Profit:</strong> ${formatMK(netProfit)}</span>
+            <span class="small">Generated: ${new Date().toLocaleString()}</span>
+        </div>
+        <h5>Receipts / Visits</h5>
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered table-striped">
+                <thead><tr><th>#</th><th>Date</th><th>Patient</th><th>Procedure</th><th class="text-end">Amount</th></tr></thead>
+                <tbody>
+                    ${monthVisits.map((v,i) => `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${formatDate(v.visit_date)}</td>
+                            <td>${getPatientName(v.patient_id)}</td>
+                            <td>${getProcedureName(v.procedure_id)}</td>
+                            <td class="text-end">${formatMK(v.amount)}</td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="5" class="text-center">No visits this month</td></tr>'}
+                </tbody>
+                <tfoot><tr><th colspan="4" class="text-end">Total</th><th class="text-end">${formatMK(totalRevenue)}</th></tr></tfoot>
+            </table>
+        </div>
+        <h5>Expenses</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead><tr><th>#</th><th>Title</th><th>Category</th><th>Date</th><th class="text-end">Amount</th></tr></thead>
+                <tbody>
+                    ${monthExpenses.map((e,i) => `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${e.title}</td>
+                            <td>${e.category}</td>
+                            <td>${formatDate(e.expense_date)}</td>
+                            <td class="text-end">${formatMK(e.amount)}</td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="5" class="text-center">No expenses this month</td></tr>'}
+                </tbody>
+                <tfoot><tr><th colspan="4" class="text-end">Total</th><th class="text-end">${formatMK(totalExpenses)}</th></tr></tfoot>
+            </table>
+        </div>
+    </div>`;
+}
+
+/* ---------- MONTHLY EXPENSES ---------- */
+function renderMonthlyExpenses(container, month) {
+    const [year, mon] = month.split('-').map(Number);
+    const expenses = DB.expenses.filter(e => {
+        const d = new Date(e.expense_date);
+        return d.getFullYear() === year && d.getMonth()+1 === mon;
+    });
+    const total = expenses.reduce((s,e) => s + e.amount, 0);
+
+    container.innerHTML = `
+    <div class="main-card">
+        <img src="Screenshot%20%281%29_5509.jpg" alt="Happy Tooth Dental logo" class="receipt-logo">
+        <div class="d-flex justify-content-between mb-3">
+            <h2>Monthly Expenses – ${new Date(year, mon-1).toLocaleString('default', { month:'long', year:'numeric' })}</h2>
+            <div class="no-print">
+                <button class="btn btn-secondary" onclick="showPage('manageMonths')">Back</button>
+                <button class="btn btn-primary" onclick="window.print()">Print</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead><tr><th>#</th><th>Title</th><th>Category</th><th>Date</th><th>Payment</th><th class="text-end">Amount</th></tr></thead>
+                <tbody>
+                    ${expenses.map((e,i) => `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${e.title}</td>
+                            <td>${e.category}</td>
+                            <td>${formatDate(e.expense_date)}</td>
+                            <td>${e.payment_method || 'Cash'}</td>
+                            <td class="text-end">${formatMK(e.amount)}</td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="6" class="text-center">No expenses this month</td></tr>'}
+                </tbody>
+                <tfoot><tr><th colspan="5" class="text-end">Total</th><th class="text-end">${formatMK(total)}</th></tr></tfoot>
+            </table>
+        </div>
+    </div>`;
+}
+
+// ================================================================
+// 5. INITIALISE
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Dark mode
+    const toggle = document.getElementById('darkModeToggle');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (toggle) toggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+    }
+    if (toggle) {
+        toggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            this.innerHTML = isDark ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-fill"></i>';
+        });
+    }
+    initializeLoginConfig().then(() => showPage(isAuthenticated ? 'dashboard' : 'login')).catch(error => {
+        document.getElementById('appContainer').innerHTML = `<div class="alert alert-danger mt-4">Unable to initialize login: ${error.message}</div>`;
+    });
+});
+
+// Expose functions globally for inline onclick
+window.showPage = showPage;
+window.archiveCurrentMonth = archiveCurrentMonth;
+window.deleteArchivedMonth = deleteArchivedMonth;
+window.deletePatient = deletePatient;
+window.deleteVisit = deleteVisit;
+window.deleteExpense = deleteExpense;
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
